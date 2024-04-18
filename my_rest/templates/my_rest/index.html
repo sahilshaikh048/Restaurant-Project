@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sahil's Kitchen</title>
-    <link rel="shortcut icon" href="{% static 'my_rest/images/favicon.ico' %}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{% static 'my_rest/images/apple-touch-icon.png' %}">
     <link rel="stylesheet" href="{% static 'my_rest/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'my_rest/css/style.css' %}">
@@ -16,27 +15,36 @@
 </head>
 <body>
     <header class="top-navbar">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container">
-                <a class="navbar-brand" href="{% url 'index' %}">
-                    <h3>Sahil's Kitchen</h3>
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbars-rs-food" aria-controls="navbars-rs-food" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbars-rs-food">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item active"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'menu' %}">Menu</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'reservation' %}">Reservation</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:login' %}">Admin Login</a></li>
-                    </ul>
-                </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <h3>Sahil's Kitchen</h3>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbars-rs-food" aria-controls="navbars-rs-food" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbars-rs-food">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'menu' %}">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'reservation' %}">Reservation</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'view_cart' %}">View Cart</a></li> <!-- Added View Cart link -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">{{ user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Signup</a></li>
+                    {% endif %}
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
 <!-- Start slides -->
 	<div id="slides" class="cover-slides">
