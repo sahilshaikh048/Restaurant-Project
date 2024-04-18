@@ -56,13 +56,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'rest_mgmt.urls'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'my_rest', 'static'),
-]
-
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'my_rest/static'),]
 
 TEMPLATES = [
     {
