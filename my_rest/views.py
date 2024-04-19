@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.http import JsonResponse
 from .models import MenuItem
+from django.core.exceptions import ObjectDoesNotExist
 from .cart import Cart
 import json
 
@@ -39,6 +40,15 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'my_rest/login.html', {'form': form})
+    
+    
+#######################################    
+
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from .models import MenuItem
+from .cart import Cart
+import json
 
 def menu(request):
     menu_items = MenuItem.objects.all()
@@ -48,18 +58,24 @@ def menu(request):
 def add_to_cart(request, item_id):
     if request.method == 'POST':
         item = MenuItem.objects.get(id=item_id)
-        cart_data = request.session.get('cart', '[]')
-        cart = Cart.from_json(cart_data)
+        cart_data = request.session.get('cart')
+        if cart_data:
+            cart = json.loads(cart_data)
+        else:
+            cart = []
+        
         item_dict = {
             'id': item.id,
             'name': item.name,
             'price': str(item.price),
             'quantity': 1
         }
-        cart.add_item(item_dict)
-        request.session['cart'] = cart.to_json()
+        cart.append(item_dict)
+        request.session['cart'] = json.dumps(cart)
         return JsonResponse({'message': 'Item added to cart successfully'})
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
 
 def view_cart(request):
     cart_data = request.session.get('cart')
@@ -67,29 +83,31 @@ def view_cart(request):
         cart = json.loads(cart_data)
     else:
         cart = []
+
     return render(request, 'my_rest/cart.html', {'cart': cart})
 
 
 def remove_from_cart(request, item_id):
     if request.method == 'POST':
         try:
-            item = MenuItem.objects.get(id=item_id)
-            cart_data = request.session.get('cart')
-            if cart_data:
-                cart = json.loads(cart_data)
-                if str(item_id) in cart:
-                    del cart[str(item_id)]
-                    request.session['cart'] = json.dumps(cart)
-                    request.session.modified = True
-                    return JsonResponse({'message': 'Item removed from cart successfully'})
-        except MenuItem.DoesNotExist:
-            return JsonResponse({'message': 'Item does not exist in cart.'})
-    return redirect('view_cart')
+            item_id = int(item_id)
+            cart = get_or_create_cart(request)
+            cart.remove_item(item_id)
+            request.session['cart'] = cart.to_json()
+            return JsonResponse({'message': 'Item removed from cart successfully'})
+        except ValueError:
+            return JsonResponse({'error': 'Invalid item ID'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
-def place_order(request):
-    if request.method == 'POST':
-        cart = request.session.get('cart')
-        if cart:
-            # Here you can add the logic to place the order
-            del request.session['cart']
-    return redirect('menu')
+def get_or_create_cart(request):
+    cart_data = request.session.get('cart')
+    if cart_data:
+        cart = Cart.from_json(cart_data)
+    else:
+        cart = Cart()
+    return cart
+    
+    
+def deserialize_cart(cart_data):
+    return Cart.from_json(cart_data)

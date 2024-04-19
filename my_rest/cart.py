@@ -1,63 +1,41 @@
 import json
 
+class MenuItem:
+    def __init__(self, id, name, price):
+        self.id = id
+        self.name = name
+        self.price = price
+
 class Cart:
     def __init__(self):
         self.items = []
 
     def add_item(self, item):
-        """
-        Add an item to the cart.
-        """
         self.items.append(item)
 
-    def remove_item(self, item):
-        """
-        Remove an item from the cart.
-        """
-        if item in self.items:
-            self.items.remove(item)
+    def remove_item(self, item_id):
+        self.items = [item for item in self.items if item.id != item_id]
 
-    def calculate_total(self):
-        """
-        Calculate the total price of items in the cart.
-        """
-        total = sum(float(item['price']) for item in self.items)
-        return total
-
-    def place_order(self):
-        """
-        Place the order and print out the items in the cart.
-        Reset the cart after placing the order.
-        """
-        if not self.items:
-            print("Your cart is empty. Cannot place an empty order.")
-            return
-
-        print("Order Details:")
-        for item in self.items:
-            print(f"- {item['name']}: ${item['price']}")
-
-        total = self.calculate_total()
-        print(f"Total: ${total}")
-
-        # Reset the cart after placing the order
-        self.items = []
-        print("Your order has been placed. Thank you!")
-
-    @classmethod
-    def from_json(cls, cart_data):
-        if not cart_data:
-            return cls()
-        if isinstance(cart_data, str):
-            cart_data = json.loads(cart_data)
-        if isinstance(cart_data, list):  # Handle the case where cart_data is a list
-            cart_data = {'items': cart_data}
-        cart = cls()
-        cart.items = cart_data.get('items', [])
-        return cart
+    def get_items(self):
+        return self.items
 
     def to_json(self):
-        """
-        Serialize the cart object to JSON format.
-        """
-        return json.dumps({'items': self.items})
+        # Serialize cart to JSON
+        pass
+
+    @classmethod
+    def from_json(cls, json_data):
+        cart = cls()
+        if json_data:
+            try:
+                cart_data = json.loads(json_data)
+                # Assuming cart_data contains a list of dictionary objects representing items
+                for item_data in cart_data:
+                    item = MenuItem(item_data['id'], item_data['name'], item_data['price'])
+                    cart.add_item(item)
+            except json.JSONDecodeError:
+                pass  # Handle JSON decoding error gracefully
+        return cart
+
+        
+        
