@@ -20,7 +20,7 @@ class Cart:
         return self.items
 
     def to_json(self):
-        # Serialize cart to JSON
+        
         pass
 
     @classmethod
@@ -29,12 +29,12 @@ class Cart:
         if json_data:
             try:
                 cart_data = json.loads(json_data)
-                # Assuming cart_data contains a list of dictionary objects representing items
+
                 for item_data in cart_data:
                     item = MenuItem(item_data['id'], item_data['name'], item_data['price'])
                     cart.add_item(item)
             except json.JSONDecodeError:
-                pass  # Handle JSON decoding error gracefully
+                pass  
         return cart
 
         
